@@ -1,6 +1,6 @@
 # EE641_project
 # Reference: [segmentation_models.pytorch](https://github.com/qubvel/segmentation_models.pytorch)
-#### 1. Create your first Segmentation model with SMP
+#### 1. Create your first Segmentation model with SM
 
 Segmentation model is just a PyTorch nn.Module, which can be created as easy as:
 
