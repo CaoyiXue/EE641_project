@@ -5,9 +5,9 @@
 Segmentation model is just a PyTorch nn.Module, which can be created as easy as:
 
 ```python
-import segmentation_models_pytorch as smp
+import seg_models as sm
 
-model = smp.Unet(
+model = sm.Unet(
     encoder_name="resnet18",        # choose encoder, e.g. mobilenet_v2 or efficientnet-b7
     in_channels=3,                  # model input channels (1 for gray-scale images, 3 for RGB, etc.)
     classes=2,                      # model output channels (number of classes in your dataset)
