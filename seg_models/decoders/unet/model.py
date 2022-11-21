@@ -1,5 +1,5 @@
-from segmentation_models_pytorch.encoders import get_encoder
-from segmentation_models_pytorch.base import (
+from seg_models.encoders import get_encoder
+from seg_models.base import (
     SegmentationModel,
     SegmentationHead,
     ClassificationHead,

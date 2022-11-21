@@ -3,8 +3,6 @@ import torch.nn as nn
 from typing import List
 from collections import OrderedDict
 
-from . import _utils as utils
-
 def patch_first_conv(model, new_in_channels, default_in_channels=3, pretrained=True):
     """Change first convolution layer input channels.
     In case:
@@ -80,7 +78,7 @@ class EncoderMixin:
         if self._out_channels[0] == 3:
             self._out_channels = tuple([in_channels] + list(self._out_channels)[1:])
 
-        utils.patch_first_conv(model=self, new_in_channels=in_channels, pretrained=pretrained)
+        patch_first_conv(model=self, new_in_channels=in_channels, pretrained=pretrained)
 
     def get_stages(self):
         """Override it in your implementation"""

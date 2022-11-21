@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from segmentation_models_pytorch.base import modules as md
+from seg_models.base import modules as md
 
 
 class DecoderBlock(nn.Module):

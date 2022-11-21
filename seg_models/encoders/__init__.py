@@ -1,14 +1,12 @@
-import timm
-import functools
 import torch.utils.model_zoo as model_zoo
 
 from .resnet import resnet_encoders
 from .mobilenet import mobilenet_encoders
-# from .micronet import micronet_encoders
+from .micronet import micronet_encoders
 encoders = {}
 encoders.update(resnet_encoders)
 encoders.update(mobilenet_encoders)
-#encoders.update(micronet_encoders)
+encoders.update(micronet_encoders)
 
 def get_encoder(name, in_channels=3, depth=5, weights=None, output_stride=32, **kwargs):
 
