@@ -19,7 +19,8 @@ def get_subject_list(dataset_dir):
 
     # dataset_dir = Train/Test/Val for a given dataset
     list_categories = os.listdir(dataset_dir)
-
+    if '.DS_Store' in list_categories:
+        list_categories.remove('.DS_Store')
     for category in list_categories:  # categories = COVID-19 || Non-COVID-19 || Normal
         # print(category)
         # files dir = images & infection masks & lung masks (maybe)
@@ -117,11 +118,12 @@ def get_loader(target_directory=None, train_bs=1, val_bs=1, num_works=10):
         tio.RescaleIntensity(out_min_max=(0, 1)),
 
     ])
+    test_transforms = tio.RescaleIntensity(out_min_max=(0, 1))
 
     train_dataset = tio.SubjectsDataset(train_subjects, transform=transforms)
 
-    val_dataset = tio.SubjectsDataset(val_subjects)
-    test_dataset = tio.SubjectsDataset(test_subjects)
+    val_dataset = tio.SubjectsDataset(val_subjects, transform=test_transforms)
+    test_dataset = tio.SubjectsDataset(test_subjects, transform=test_transforms)
 
     train_loader = data.DataLoader(
         dataset=train_dataset, batch_size=train_bs, shuffle=True, num_workers=num_works)
