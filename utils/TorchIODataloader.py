@@ -3,6 +3,8 @@ import torch
 import torchio as tio
 import os
 import torch.utils.data as data
+import SimpleITK as sitk
+import numpy as np
 
 
 def get_subject_list(dataset_dir):
@@ -13,7 +15,7 @@ def get_subject_list(dataset_dir):
     patient_list = []
     category_switch = {  # lookup dictionary for mapping the folder name to the file prefix
         "COVID-19": "covid",
-        "Non-COVID": "non_COVID",
+        "Non-COVID": "Non_COVID",
         "Normal": "Normal"
     }
 
@@ -42,37 +44,75 @@ def get_subject_list(dataset_dir):
 
             subject_dict = {}  # this is a dictionary for an individual patient
             # this stores the patient number in the dictionary so that it can be refrenced later in the Subject instance
+
+          
+
             subject_dict["patient_id"] = patient_number
             # stores the classifcation type
             subject_dict["category"] = category
             # this creates a TorchIO scalar image from the patient image file
-            subject_dict["image"] = tio.ScalarImage(full_dir)
+
+            # load to ram first
+            image = sitk.ReadImage(full_dir)
+            array = sitk.GetArrayFromImage(image)
+            tensor = torch.from_numpy(np.expand_dims(array,(0,-1)))
+            # subject_dict["image"] = tio.ScalarImage(full_dir)
+            subject_dict['image'] = tio.ScalarImage(tensor = tensor)
 
             # the Label Map class handles binary mask images, this is needed for the automatic seleciton of post-transformation
             # interpolation. Label Maps use a nearest neighbor interpolation, Scalar images by default use a b-spline
             if "sub" in patient_number:
+                image = sitk.ReadImage(os.path.join(lung_dir, patient_file))
+                array = sitk.GetArrayFromImage(image)
+                tensor = torch.from_numpy(np.expand_dims(array,(0,-1)))
+                # subject_dict["lung mask"] = tio.LabelMap(
+                #     os.path.join(lung_dir, patient_file))
                 subject_dict["lung mask"] = tio.LabelMap(
-                    os.path.join(lung_dir, patient_file))
-            elif category == "COVID-19":
-                subject_dict["lung mask"] = tio.LabelMap(os.path.join(
-                    lung_dir, category_switch[category] + "_"+str(patient_number) + ".nii.gz"))
-            else:
-                subject_dict["lung mask"] = tio.LabelMap(os.path.join(
-                    lung_dir, category_switch[category] + " ("+str(patient_number) + ").nii.gz"))
+                    tensor = tensor)
 
+            elif category == "COVID-19":
+                image = sitk.ReadImage(os.path.join(
+                    lung_dir, category_switch[category] + "_"+str(patient_number) + ".nii.gz"))
+                array = sitk.GetArrayFromImage(image)
+                tensor = torch.from_numpy(np.expand_dims(array,(0,-1)))
+                # subject_dict["lung mask"] = tio.LabelMap(os.path.join(
+                #     lung_dir, category_switch[category] + "_"+str(patient_number) + ".nii.gz"))
+                subject_dict["lung mask"] = tio.LabelMap(tensor = tensor)
+            else:
+                image = sitk.ReadImage(os.path.join(
+                    lung_dir, category_switch[category] + " ("+str(patient_number) + ").nii.gz"))
+                array = sitk.GetArrayFromImage(image)
+                tensor = torch.from_numpy(np.expand_dims(array,(0,-1)))
+                # subject_dict["lung mask"] = tio.LabelMap(os.path.join(
+                #     lung_dir, category_switch[category] + " ("+str(patient_number) + ").nii.gz"))
+                subject_dict["lung mask"] = tio.LabelMap(tensor = tensor)
             # Lung segment dataset does not have infection masks
             if os.path.exists(infection_dir):
                 if "sub" in patient_number:
-                    subject_dict['infection mask'] = tio.LabelMap(os.path.join(
+                    image = sitk.ReadImage(os.path.join(
                         infection_dir, category_switch[category] + "_"+str(patient_number) + ".nii.gz"))
+                    array = sitk.GetArrayFromImage(image)
+                    tensor = torch.from_numpy(np.expand_dims(array,(0,-1)))
+                    # subject_dict['infection mask'] = tio.LabelMap(os.path.join(
+                    #     infection_dir, category_switch[category] + "_"+str(patient_number) + ".nii.gz"))
+                    subject_dict['infection mask'] = tio.LabelMap(tensor = tensor) 
                 elif category == "COVID-19":
-
-                    subject_dict['infection mask'] = tio.LabelMap(os.path.join(
+                    image = sitk.ReadImage(os.path.join(
                         infection_dir, category_switch[category] + "_"+str(patient_number) + ".nii.gz"))
+                    array = sitk.GetArrayFromImage(image)
+                    tensor = torch.from_numpy(np.expand_dims(array,(0,-1)))
+                    # subject_dict['infection mask'] = tio.LabelMap(os.path.join(
+                    #     infection_dir, category_switch[category] + "_"+str(patient_number) + ".nii.gz"))
+                    subject_dict['infection mask'] = tio.LabelMap(tensor = tensor)
 
                 else:
-                    subject_dict['infection mask'] = tio.LabelMap(os.path.join(
-                        infection_dir, category_switch[category] + " ("+str(patient_number) + ").nii.gz"))
+                    image = sitk.ReadImage(os.path.join(
+                         infection_dir, category_switch[category] + " ("+str(patient_number) + ").nii.gz"))
+                    array = sitk.GetArrayFromImage(image)
+                    tensor = torch.from_numpy(np.expand_dims(array,(0,-1)))
+                    # subject_dict['infection mask'] = tio.LabelMap(os.path.join(
+                    #     infection_dir, category_switch[category] + " ("+str(patient_number) + ").nii.gz"))
+                    subject_dict['infection mask'] = tio.LabelMap(tensor = tensor)
 
             # creates the "Subject" instance from the dictinoary. This is the wrapper for all of
             subject = tio.Subject(subject_dict)
