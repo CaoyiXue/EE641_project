@@ -3,7 +3,6 @@ import torch.nn as nn
 from torchvision.models.resnet import ResNet
 from torchvision.models.resnet import BasicBlock
 from torchvision.models.resnet import Bottleneck
-from pretrainedmodels.models.torchvision_models import pretrained_settings
 
 from ._base import EncoderMixin
 
@@ -47,7 +46,6 @@ class ResNetEncoder(ResNet, EncoderMixin):
 resnet_encoders = {
     "resnet18": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnet18"],
         "params": {
             "out_channels": (3, 64, 64, 128, 256, 512),
             "block": BasicBlock,
@@ -56,7 +54,6 @@ resnet_encoders = {
     },
     "resnet34": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnet34"],
         "params": {
             "out_channels": (3, 64, 64, 128, 256, 512),
             "block": BasicBlock,
@@ -65,7 +62,6 @@ resnet_encoders = {
     },
     "resnet50": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnet50"],
         "params": {
             "out_channels": (3, 64, 256, 512, 1024, 2048),
             "block": Bottleneck,
@@ -74,7 +70,6 @@ resnet_encoders = {
     },
     "resnet101": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnet101"],
         "params": {
             "out_channels": (3, 64, 256, 512, 1024, 2048),
             "block": Bottleneck,
@@ -83,7 +78,6 @@ resnet_encoders = {
     },
     "resnet152": {
         "encoder": ResNetEncoder,
-        "pretrained_settings": pretrained_settings["resnet152"],
         "params": {
             "out_channels": (3, 64, 256, 512, 1024, 2048),
             "block": Bottleneck,
