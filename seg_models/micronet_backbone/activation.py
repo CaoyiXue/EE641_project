@@ -181,7 +181,10 @@ class DYShiftMax(nn.Module):
             a1, b1 = torch.split(y, self.oup, dim=1)
             a1 = a1 + self.init_a[0]
             b1 = b1 + self.init_b[0]
+
             out = x_out * a1 + x2 * b1
+        else:
+            out = x_out
 
         return out
 
