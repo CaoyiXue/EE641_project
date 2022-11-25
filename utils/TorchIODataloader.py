@@ -5,7 +5,7 @@ import os
 import torch.utils.data as data
 import SimpleITK as sitk
 import numpy as np
-
+import os
 
 def get_subject_list(dataset_dir):
     '''
@@ -21,8 +21,7 @@ def get_subject_list(dataset_dir):
 
     # dataset_dir = Train/Test/Val for a given dataset
     list_categories = os.listdir(dataset_dir)
-    if '.DS_Store' in list_categories:
-        list_categories.remove('.DS_Store')
+
     for category in list_categories:  # categories = COVID-19 || Non-COVID-19 || Normal
         # print(category)
         # files dir = images & infection masks & lung masks (maybe)
