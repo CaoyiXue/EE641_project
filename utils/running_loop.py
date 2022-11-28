@@ -149,7 +149,10 @@ def test_loop(model, test_loader, mask_name='infection mask', device="cpu"):
             img = img.to(device)
             mask = mask.to(device)
             outputs = model(img)
-            _, predicted = torch.max(outputs, dim=1)
+            outputs = torch.sigmoid(outputs)            
+            predicted = torch.zeros(outputs.shape)
+            predicted[outputs > 0.5] = 1
+
             acc_tensor.append(accuracy(predicted, mask))
             IoU_tensor.append(IoU(predicted, mask))
             DSC_tensor.append(DSC(predicted, mask))

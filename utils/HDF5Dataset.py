@@ -23,7 +23,7 @@ class HDF5Dataset(Dataset):
         else:
             img = torch.from_numpy(img)
 
-        mask = torch.from_numpy(imgs[1]).long()
+        mask = torch.from_numpy(imgs[1]).float()
         label = self.data_cache[self.name_label][index]
         # image, mask, label
         return img, mask ,label
