@@ -1,6 +1,7 @@
 import time
 import torch
 import torchio as tio
+import torch.nn.functional as F
 #label2num = {'COVID-19': 0, 'Non-COVID': 1, 'Normal': 2}
 def training_loop(model, optimizer, loss_fcn, 
                   train_loader, val_loader, mask_name='infection mask',
@@ -18,7 +19,7 @@ def training_loop(model, optimizer, loss_fcn,
         start_time = time.time()
         for batch_i, (imgs, masks, labels) in enumerate(train_loader):
 
-            if batch_i % 10 == 0:
+            if batch_i % 100 == 0:
                 print(f"Epoch {epoch}, Batch {batch_i}")
             imgs = imgs.to(device)
             masks = masks.to(device)
@@ -86,6 +87,16 @@ def IoU(pred, real):
         return 0.0
     return intersection/union
 
+def IoUloss(pred, real):
+    pred = pred.view(-1)
+    real = real.view(-1)
+    intersection = (pred * real).sum()
+    total = (pred + real).sum()
+    union = total - intersection
+    if union == 0:
+        return 0.0
+    return 1-intersection/union
+
 def DSC(pred, real):
     pred = pred.view(-1)
     real = real.view(-1)
@@ -93,6 +104,26 @@ def DSC(pred, real):
     if (pred.sum()+real.sum()) == 0:
         return 0.0
     return (2.*intersection)/(pred.sum()+real.sum())
+
+class DiceBCELoss(torch.nn.Module):
+    def __init__(self, weight=None, size_average=True):
+        super(DiceBCELoss, self).__init__()
+
+    def forward(self, inputs, targets, smooth=1):
+        
+        #comment out if your model contains a sigmoid or equivalent activation layer
+        inputs = F.sigmoid(inputs)       
+        
+        #flatten label and prediction tensors
+        inputs = inputs.view(-1)
+        targets = targets.view(-1)
+        
+        intersection = (inputs * targets).sum()                            
+        dice_loss = 1 - (2.*intersection + smooth)/(inputs.sum() + targets.sum() + smooth)  
+        BCE = F.binary_cross_entropy(inputs, targets, reduction='mean')
+        Dice_BCE = BCE + dice_loss
+        
+        return Dice_BCE
 
 def infection_rate(lung_mask, infection_mask):
     lung_mask = lung_mask.view(-1)
@@ -104,16 +135,13 @@ def test_loop(model, test_loader, mask_name='infection mask', device="cpu"):
 
     assert(test_loader.batch_size==1)
     assert(mask_name in ['lung mask', 'infection mask'])
-    acc_tensor = torch.empty(len(test_loader.dataset)).to(device)
-    IoU_tensor = torch.empty(len(test_loader.dataset)).to(device)
-    DSC_tensor = torch.empty(len(test_loader.dataset)).to(device)
+    acc_tensor = []
+    IoU_tensor = []
+    DSC_tensor = []
 
     with torch.no_grad():
         model.eval()
         for batch_i, (img, mask, label) in enumerate(test_loader):
-
-            if batch_i % 10 == 0:
-                print(f'patient {batch_i}')
 
             if mask_name == 'infection mask' and label != 0:
                 continue
@@ -122,10 +150,13 @@ def test_loop(model, test_loader, mask_name='infection mask', device="cpu"):
             mask = mask.to(device)
             outputs = model(img)
             _, predicted = torch.max(outputs, dim=1)
-            acc_tensor[batch_i] = accuracy(predicted, mask)
-            IoU_tensor[batch_i] = IoU(predicted, mask)
-            DSC_tensor[batch_i] = DSC(predicted, mask)
+            acc_tensor.append(accuracy(predicted, mask))
+            IoU_tensor.append(IoU(predicted, mask))
+            DSC_tensor.append(DSC(predicted, mask))
 
+    acc_tensor = torch.tensor(acc_tensor).to(device)
+    IoU_tensor = torch.tensor(IoU_tensor).to(device)
+    DSC_tensor = torch.tensor(DSC_tensor).to(device)
     acc_mean, acc_std = acc_tensor.mean().item(), acc_tensor.std().item()
     IoU_mean, IoU_std = IoU_tensor.mean().item(), IoU_tensor.std().item()
     DSC_mean, DSC_std = DSC_tensor.mean().item(), DSC_tensor.std().item()
