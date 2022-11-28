@@ -77,6 +77,9 @@ def accuracy(pred, real):
     return acc/len(real)
 
 def IoU(pred, real):
+    pred = torch.squeeze(pred)
+    real = torch.squeeze(real)
+    
     pred = pred.view(-1)
     real = real.view(-1)
     intersection = (pred * real).sum()
@@ -87,6 +90,9 @@ def IoU(pred, real):
     return intersection/union
 
 def DSC(pred, real):
+    pred = torch.squeeze(pred) 
+    real = torch.squeeze(real)
+    
     pred = pred.view(-1)
     real = real.view(-1)
     intersection = (pred * real).sum()
