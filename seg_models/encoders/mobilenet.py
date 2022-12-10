@@ -9,7 +9,7 @@ class MobileNetV2Encoder(MobileNetV2, EncoderMixin):
         self._out_channels = out_channels
         self._in_channels = 3
         del self.classifier
-
+        
     def get_stages(self):
         return [
             nn.Identity(),

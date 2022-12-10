@@ -3,11 +3,12 @@ import h5py
 import torch
 
 class HDF5Dataset(Dataset):
-    def __init__(self, file_path, name, transform=None):
+    def __init__(self, file_path, name, transform=None, img_transform=True):
         super().__init__
         self.file_path = file_path
         self.data_cache = {}
-        self.transform = transform
+        self.transform = transform # rotate or flip
+        self.img_transform = img_transform # normalize
         self.name = str(name)
         self.name_label = str(name) + "_label"
         self.size = None
@@ -17,13 +18,16 @@ class HDF5Dataset(Dataset):
             self.size = len(hf[self.name_label])
 
     def __getitem__(self, index):
-        imgs = self.data_cache[self.name][index]
-        if self.transform:
-            img = self.transform(imgs[0])
-        else:
-            img = torch.from_numpy(img)
+        imgs = torch.from_numpy(self.data_cache[self.name][index]).float()
+        imgs[0] = imgs[0] / 255
+        if self.img_transform:
+            imgs[0] = self.img_transform(imgs[0].unsqueeze(0))
 
-        mask = torch.from_numpy(imgs[1]).float()
+        if self.transform:
+            imgs = self.transform(imgs)  
+
+        img = imgs[0].unsqueeze(0)
+        mask = imgs[1].unsqueeze(0)
         label = self.data_cache[self.name_label][index]
         # image, mask, label
         return img, mask ,label

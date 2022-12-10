@@ -8,11 +8,12 @@ from ._base import EncoderMixin
 class MicroNetEncoder(MicroNet, EncoderMixin):
     def __init__(self, out_channels, mode=0, depth=5, **kwargs):
         super().__init__(**kwargs)
-        self.mode = mode # m0, m1, m2, m3 have different stages
+        self.mode = mode  # m0, m1, m2, m3 have different stages
         self._depth = depth
         self._out_channels = out_channels
         self._in_channels = 3
         del self.classifier
+        del self.avgpool
 
     def get_stages(self):
         if self.mode == 0:
@@ -53,6 +54,10 @@ class MicroNetEncoder(MicroNet, EncoderMixin):
             features.append(x)
 
         return features
+
+    def load_state_dict(self, state_dict, **kwargs):
+        super().load_state_dict(state_dict, **kwargs)
+
 
 # micronet code configuration from authoers' code
 cfg_m0 = deepcopy(cfg)
@@ -143,6 +148,11 @@ cfg_m3.merge_from_list(cfg_m3_list)
 micronet_encoders = {
     "micronet_m0": {
         "encoder": MicroNetEncoder,
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'http://www.svcl.ucsd.edu/projects/micronet/assets/micronet-m0.pth'
+            }
+        },
         "params": {
             "out_channels": (3, 4, 8, 12, 32, 384),
             "mode": 0,
@@ -151,6 +161,11 @@ micronet_encoders = {
     },
     "micronet_m1": {
         "encoder": MicroNetEncoder,
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'http://www.svcl.ucsd.edu/projects/micronet/assets/micronet-m1.pth'
+            }
+        },
         "params": {
             "out_channels": (3, 6, 8, 16, 32, 576),
             "mode": 0,
@@ -159,6 +174,11 @@ micronet_encoders = {
     },
     "micronet_m2": {
         "encoder": MicroNetEncoder,
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'http://www.svcl.ucsd.edu/projects/micronet/assets/micronet-m2.pth'
+            }
+        },
         "params": {
             "out_channels": (3, 8, 12, 24, 64, 768),
             "mode": 1,
@@ -167,6 +187,11 @@ micronet_encoders = {
     },
     "micronet_m3": {
         "encoder": MicroNetEncoder,
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'http://www.svcl.ucsd.edu/projects/micronet/assets/micronet-m3.pth'
+            }
+        },
         "params": {
             "out_channels": (3, 12, 16, 24, 80, 864),
             "mode": 2,
