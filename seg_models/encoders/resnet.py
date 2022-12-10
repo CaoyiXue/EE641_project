@@ -43,9 +43,20 @@ class ResNetEncoder(ResNet, EncoderMixin):
         super().load_state_dict(state_dict, **kwargs)
 
 
+#(256, 128, 64, 32, 16)
 resnet_encoders = {
     "resnet18": {
         "encoder": ResNetEncoder,
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
+                'input_space': 'RGB',
+                'input_size': [3, 224, 224],
+                'input_range': [0, 1],
+                'mean': [0.485, 0.456, 0.406],
+                'std': [0.229, 0.224, 0.225],
+                'num_classes': 1000}
+        },
         "params": {
             "out_channels": (3, 64, 64, 128, 256, 512),
             "block": BasicBlock,
@@ -54,6 +65,16 @@ resnet_encoders = {
     },
     "resnet34": {
         "encoder": ResNetEncoder,
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'https://download.pytorch.org/models/resnet34-333f7ec4.pth',
+                'input_space': 'RGB',
+                'input_size': [3, 224, 224],
+                'input_range': [0, 1],
+                'mean': [0.485, 0.456, 0.406],
+                'std': [0.229, 0.224, 0.225],
+                'num_classes': 1000}
+        },
         "params": {
             "out_channels": (3, 64, 64, 128, 256, 512),
             "block": BasicBlock,
@@ -62,6 +83,16 @@ resnet_encoders = {
     },
     "resnet50": {
         "encoder": ResNetEncoder,
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'https://download.pytorch.org/models/resnet50-19c8e357.pth',
+                'input_space': 'RGB',
+                'input_size': [3, 224, 224],
+                'input_range': [0, 1],
+                'mean': [0.485, 0.456, 0.406],
+                'std': [0.229, 0.224, 0.225],
+                'num_classes': 1000}
+                },
         "params": {
             "out_channels": (3, 64, 256, 512, 1024, 2048),
             "block": Bottleneck,
@@ -70,6 +101,16 @@ resnet_encoders = {
     },
     "resnet101": {
         "encoder": ResNetEncoder,
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'https://download.pytorch.org/models/resnet101-5d3b4d8f.pth',
+                'input_space': 'RGB',
+                'input_size': [3, 224, 224],
+                'input_range': [0, 1],
+                'mean': [0.485, 0.456, 0.406],
+                'std': [0.229, 0.224, 0.225],
+                'num_classes': 1000}
+                },
         "params": {
             "out_channels": (3, 64, 256, 512, 1024, 2048),
             "block": Bottleneck,
@@ -78,6 +119,16 @@ resnet_encoders = {
     },
     "resnet152": {
         "encoder": ResNetEncoder,
+        "pretrained_settings": {
+            'imagenet': {
+                'url': 'https://download.pytorch.org/models/resnet152-b121ed2d.pth',
+                'input_space': 'RGB',
+                'input_size': [3, 224, 224],
+                'input_range': [0, 1],
+                'mean': [0.485, 0.456, 0.406],
+                'std': [0.229, 0.224, 0.225],
+                'num_classes': 1000}
+                },
         "params": {
             "out_channels": (3, 64, 256, 512, 1024, 2048),
             "block": Bottleneck,
