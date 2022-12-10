@@ -56,6 +56,14 @@ class MicroNetEncoder(MicroNet, EncoderMixin):
         return features
 
     def load_state_dict(self, state_dict, **kwargs):
+        for key in list(state_dict.keys()):
+            if 'classifier' in key:
+                state_dict.pop(key, None)
+            else:
+                key_list = key.split('.')
+                key_list.pop(0)
+                new_key = '.'.join(key_list)
+                state_dict[new_key] = state_dict.pop(key, None)
         super().load_state_dict(state_dict, **kwargs)
 
 
@@ -150,7 +158,7 @@ micronet_encoders = {
         "encoder": MicroNetEncoder,
         "pretrained_settings": {
             'imagenet': {
-                'url': 'https://github.com/CaoyiXue/EE641_project/blob/main/trained_models/micronet-m0-modified.pth'
+                'url': 'http://www.svcl.ucsd.edu/projects/micronet/assets/micronet-m0.pth'
             }
         },
         "params": {
@@ -163,7 +171,7 @@ micronet_encoders = {
         "encoder": MicroNetEncoder,
         "pretrained_settings": {
             'imagenet': {
-                'url': 'https://github.com/CaoyiXue/EE641_project/blob/main/trained_models/micronet-m1-modified.pth'
+                'url': 'http://www.svcl.ucsd.edu/projects/micronet/assets/micronet-m1.pth'
             }
         },
         "params": {
@@ -176,7 +184,7 @@ micronet_encoders = {
         "encoder": MicroNetEncoder,
         "pretrained_settings": {
             'imagenet': {
-                'url': 'https://github.com/CaoyiXue/EE641_project/blob/main/trained_models/micronet-m2-modified.pth'
+                'url': 'http://www.svcl.ucsd.edu/projects/micronet/assets/micronet-m2.pth'
             }
         },
         "params": {
@@ -189,7 +197,7 @@ micronet_encoders = {
         "encoder": MicroNetEncoder,
         "pretrained_settings": {
             'imagenet': {
-                'url': 'https://github.com/CaoyiXue/EE641_project/blob/main/trained_models/micronet-m3-modified.pth'
+                'url': 'http://www.svcl.ucsd.edu/projects/micronet/assets/micronet-m3.pth'
             }
         },
         "params": {
