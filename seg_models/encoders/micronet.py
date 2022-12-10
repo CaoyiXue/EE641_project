@@ -150,7 +150,7 @@ micronet_encoders = {
         "encoder": MicroNetEncoder,
         "pretrained_settings": {
             'imagenet': {
-                'url': 'http://www.svcl.ucsd.edu/projects/micronet/assets/micronet-m0.pth'
+                'url': 'https://github.com/CaoyiXue/EE641_project/blob/main/trained_models/micronet-m0-modified.pth'
             }
         },
         "params": {
@@ -163,7 +163,7 @@ micronet_encoders = {
         "encoder": MicroNetEncoder,
         "pretrained_settings": {
             'imagenet': {
-                'url': 'http://www.svcl.ucsd.edu/projects/micronet/assets/micronet-m1.pth'
+                'url': 'https://github.com/CaoyiXue/EE641_project/blob/main/trained_models/micronet-m1-modified.pth'
             }
         },
         "params": {
@@ -176,7 +176,7 @@ micronet_encoders = {
         "encoder": MicroNetEncoder,
         "pretrained_settings": {
             'imagenet': {
-                'url': 'http://www.svcl.ucsd.edu/projects/micronet/assets/micronet-m2.pth'
+                'url': 'https://github.com/CaoyiXue/EE641_project/blob/main/trained_models/micronet-m2-modified.pth'
             }
         },
         "params": {
@@ -189,7 +189,7 @@ micronet_encoders = {
         "encoder": MicroNetEncoder,
         "pretrained_settings": {
             'imagenet': {
-                'url': 'http://www.svcl.ucsd.edu/projects/micronet/assets/micronet-m3.pth'
+                'url': 'https://github.com/CaoyiXue/EE641_project/blob/main/trained_models/micronet-m3-modified.pth'
             }
         },
         "params": {
