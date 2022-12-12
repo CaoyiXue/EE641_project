@@ -10,7 +10,7 @@ to get corresponding data. It will ask you whether download data. If you type in
 
 ## Training
 We use the Colab platform to train our model.\
-[infect_all_models](infect_all_models.ipynb) trains all infection segmentation models.\
+[infect_all_models](infect_all_models.ipynb) trains all infection segmentation models. (MobilNet V2 with batch size 64 have trained before this code created so there are no jupyter outpus for MobilNet V2 )\
 [lung_all_models](lung_all_models.ipynb) trains all lung segmentation models.\
 [seg_models](seg_models/) implements Unet with ResNet, MobileNet V2 and MicroNet.\
 [utils](utils/) implements HDF5Dataset, training loop, test loop, IoU, DSC, COVID detection, and plot one image python functions for use
