@@ -1,6 +1,8 @@
 import torch
 from .utils import *
 import torch.optim.lr_scheduler as lr_scheduler
+import numpy as np
+from sklearn.metrics import confusion_matrix
 
 #label2num = {'COVID-19': 0, 'Non-COVID': 1, 'Normal': 2}
 def training_loop(model, optimizer, loss_fcn, 
@@ -77,7 +79,7 @@ def training_loop(model, optimizer, loss_fcn,
             
     return train_loss_list, val_loss_list
         
-def test_loop(model, test_loader, mask_name='infection mask', device="cpu"):
+def test_loop(model, encoder_name, test_loader, mask_name='infection mask', device="cpu"):
 
     assert(test_loader.batch_size==1)
     assert(mask_name in ['lung mask', 'infection mask'])
@@ -98,37 +100,60 @@ def test_loop(model, test_loader, mask_name='infection mask', device="cpu"):
             predict = predict.long()
             mask = mask.long()
 
-            acc_tensor.append(accuracy(predict, mask))
-            IoU_tensor.append(IoU(predict, mask))
-            DSC_tensor.append(DSC(predict, mask))
+            acc_tensor.append(accuracy(predict, mask)*100)
+            IoU_tensor.append(IoU(predict, mask)*100)
+            DSC_tensor.append(DSC(predict, mask)*100)
 
     acc_tensor = torch.tensor(acc_tensor).to(device)
     IoU_tensor = torch.tensor(IoU_tensor).to(device)
     DSC_tensor = torch.tensor(DSC_tensor).to(device)
-    acc_mean, acc_std = round(acc_tensor.mean().item()*100,2), round(acc_tensor.std().item()*100,2)
-    IoU_mean, IoU_std = round(IoU_tensor.mean().item()*100,2), round(IoU_tensor.std().item()*100,2)
-    DSC_mean, DSC_std = round(DSC_tensor.mean().item()*100,2), round(DSC_tensor.std().item()*100,2)
-    print(f"accuracy: {acc_mean}% ± {acc_std}%")
-    print(f"IoU: {IoU_mean}% ± {IoU_std}%")
-    print(f"DSC: {DSC_mean}% ± {DSC_std}%")
+    acc_mean, acc_std = round(acc_tensor.mean().item(),2), round(acc_tensor.std().item(),2)
+    IoU_mean, IoU_std = round(IoU_tensor.mean().item(),2), round(IoU_tensor.std().item(),2)
+    DSC_mean, DSC_std = round(DSC_tensor.mean().item(),2), round(DSC_tensor.std().item(),2)
+    print(f"{encoder_name} & {acc_mean} ± {acc_std} & {IoU_mean} ± {IoU_std} & {DSC_mean} ± {DSC_std}")
     res = (acc_mean, acc_std, IoU_mean, IoU_std, DSC_mean, DSC_std)
     
     return res
 
-# def COVID_detection(lung_model, infect_model, test_loader, device='cpu'):
-#     assert(test_loader.batch_size==1)
-#     correct = 0
-#     with torch.no_grad():
-#         lung_model.eval(), infect_model.eval()
-#         for batch_i, batch in enumerate(test_loader):
-#             imgs = batch['image'][tio.DATA].squeeze_(-1).to(device)
-#             label = batch['category'] == 'COVID-19'
-#             predict = infection_rate(lung_model(imgs), infect_model(imgs)) > 0
-#             if label == predict:
-#                 correct += 1
-#     acc = correct / len(test_loader.dataset)
-#     print(f"COVID_19 detection accuracy: {acc}")
-#     # TO-DO: precision, recall ....
-#     return acc
+
+def COVID_detection(infect_model, encoder_name, test_loader, device='cpu'):
+    assert(test_loader.batch_size == 1)
+    correct = 0
+    true_label = np.zeros(len(test_loader.dataset))
+    predict_label = np.zeros(len(test_loader.dataset))
+    with torch.no_grad():
+        infect_model.eval()
+        for batch_i, (img, mask, label) in enumerate(test_loader):
+            if label != 0:
+                true_label[batch_i] = 1
+            img = img.to(device)
+            output = infect_model(img)
+            if (output >= 0.5).sum() == 0:
+                predict_label[batch_i] = 1
+
+    cm = confusion_matrix(y_true=true_label, y_pred=predict_label, labels=[0, 1])
+    TP = np.diag(cm) # True Positive
+    FP = cm.sum(axis=0) - TP  # False Positive
+    FN = cm.sum(axis=1) - TP # False Negative
+    TN = cm.sum() - (FP + FN + TP) # True Negative
+
+    accuracy = (TP+TN)/(TP+FP+FN+TN)
+    # True positive rate, sensitivity, hit rate or recall
+    sensitivity = TP/(TP+FN)
+    # True negative rate or specificity
+    specificity = TN/(TN+FP)
+    # Precision or positive predictive value
+    precision = TP/(TP+FP)
+    # F1 score
+    F1 = 2*precision*sensitivity/(precision+sensitivity)
+    accuracy = np.round(accuracy[0]*100,2)
+    sensitivity = np.round(sensitivity[0]*100,2)
+    specificity = np.round(specificity[0]*100,2)
+    precision = np.round(precision[0]*100,2)
+    F1 = np.round(F1[0]*100,2)
+
+    print(f"{encoder_name} & {accuracy} & {sensitivity} & {specificity} & {precision} & {F1}")
+
+    return 
 
 
