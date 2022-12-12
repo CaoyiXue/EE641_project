@@ -9,8 +9,8 @@ python create_HDF5.py
 to get corresponding data. It will ask you whether download data. If you type in yes, it will automatically download data, otherwise you need to go to [Kaggle](https://www.kaggle.com/datasets/anasmohammedtahir/covidqu) to download COVID-QU-Ex Dataset
 
 ## Training
-We use the Colab platform to train our model.\ 
-[infect_all_models](infect_all_models.ipynb) trains all infection segmentation models.\ 
+We use the Colab platform to train our model.\
+[infect_all_models](infect_all_models.ipynb) trains all infection segmentation models.\
 [lung_all_models](lung_all_models.ipynb) trains all lung segmentation models.\
 [seg_models](seg_models/) implements Unet with ResNet, MobileNet V2 and MicroNet.\
 [utils](utils/) implements HDF5Dataset, training loop, test loop, IoU, DSC, COVID detection, and plot one image python functions for use
